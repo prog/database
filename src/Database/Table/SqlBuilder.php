@@ -71,6 +71,9 @@ class SqlBuilder
 	/** @var string grouping condition */
 	protected $having = '';
 
+	/** @var string lock clause */
+	protected $lock = '';
+
 	/** @var array of reserved table names associated with chain */
 	protected $reservedTableNames = [];
 
@@ -223,6 +226,10 @@ class SqlBuilder
 		$query = "{$querySelect} FROM {$this->delimitedTable}{$queryJoins}{$queryCondition}{$queryEnd}";
 
 		$this->driver->applyLimit($query, $this->limit, $this->offset);
+
+		if ($this->lock !== '') {
+			$query .= " {$this->lock}";
+		}
 
 		return $this->tryDelimite($query);
 	}
@@ -514,6 +521,18 @@ class SqlBuilder
 	public function getHaving(): string
 	{
 		return $this->having;
+	}
+
+
+	public function setLock($lock): void
+	{
+		$this->lock = $lock;
+	}
+
+
+	public function getLock(): string
+	{
+		return $this->lock;
 	}
 
 

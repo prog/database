@@ -441,6 +441,18 @@ class Selection implements \Iterator, IRowContainer, \ArrayAccess, \Countable
 
 
 	/**
+	 * Set lock clause, more calls rewrite old value.
+	 * @return static
+	 */
+	public function lock(string $lock)
+	{
+		$this->emptyResultSet();
+		$this->sqlBuilder->setLock($lock);
+		return $this;
+	}
+
+
+	/**
 	 * Aliases table. Example ':book:book_tag.tag', 'tg'
 	 * @return static
 	 */

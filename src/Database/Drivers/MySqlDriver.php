@@ -26,6 +26,8 @@ class MySqlDriver implements Nette\Database\ISupplementalDriver
 
 	/** @var Nette\Database\Connection */
 	private $connection;
+	/** @var string */
+	private $version;
 
 
 	/**
@@ -36,8 +38,9 @@ class MySqlDriver implements Nette\Database\ISupplementalDriver
 	public function initialize(Nette\Database\Connection $connection, array $options): void
 	{
 		$this->connection = $connection;
+		$this->version = $connection->getPdo()->getAttribute(\PDO::ATTR_SERVER_VERSION);
 		$charset = $options['charset']
-			?? (version_compare($connection->getPdo()->getAttribute(\PDO::ATTR_SERVER_VERSION), '5.5.3', '>=') ? 'utf8mb4' : 'utf8');
+			?? (version_compare($this->version, '5.5.3', '>=') ? 'utf8mb4' : 'utf8');
 		if ($charset) {
 			$connection->query('SET NAMES ?', $charset);
 		}
@@ -61,6 +64,9 @@ class MySqlDriver implements Nette\Database\ISupplementalDriver
 
 		} elseif (in_array($code, [1048, 1121, 1138, 1171, 1252, 1263, 1566], true)) {
 			return Nette\Database\NotNullConstraintViolationException::from($e);
+
+		} elseif ($code === 1205) {
+			return Nette\Database\LockWaitTimeoutException::from($e);
 
 		} else {
 			return Nette\Database\DriverException::from($e);
@@ -108,6 +114,20 @@ class MySqlDriver implements Nette\Database\ISupplementalDriver
 			$sql .= ' LIMIT ' . ($limit === null ? '18446744073709551615' : $limit)
 				. ($offset ? ' OFFSET ' . $offset : '');
 		}
+	}
+
+
+	public function applyFor(string &$sql, string $for): void
+	{
+		$versionBefore8 = version_compare($this->version, "8", "<");
+
+		if ($for === '') {
+			return;
+		}
+
+		$sql .= ($versionBefore8 && $for === "SHARE")
+			? " LOCK IN SHARE MODE"
+			: " FOR {$for}";
 	}
 
 

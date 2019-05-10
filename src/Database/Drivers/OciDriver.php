@@ -96,6 +96,12 @@ class OciDriver implements Nette\Database\ISupplementalDriver
 	}
 
 
+	public function applyFor(string &$sql, string $for): void
+	{
+		throw new Nette\NotImplementedException;
+	}
+
+
 	/********************* reflection ****************d*g**/
 
 

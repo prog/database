@@ -54,6 +54,7 @@ class SqlBuilder
 		'group' => [],
 		'having' => [],
 		'order' => [],
+		'for' => [],
 	];
 
 	/** @var array or columns to order by */
@@ -71,8 +72,8 @@ class SqlBuilder
 	/** @var string grouping condition */
 	protected $having = '';
 
-	/** @var string lock clause */
-	protected $lock = '';
+	/** @var string for clause */
+	protected $for = '';
 
 	/** @var array of reserved table names associated with chain */
 	protected $reservedTableNames = [];
@@ -158,6 +159,7 @@ class SqlBuilder
 			'queryEnd' => $this->buildQueryEnd(),
 			$this->aliases,
 			$this->limit, $this->offset,
+			$this->for,
 		];
 		if ($this->select) {
 			$parts[] = $this->select;
@@ -175,6 +177,7 @@ class SqlBuilder
 			$this->parameters['group'],
 			$this->parameters['having'],
 			$this->parameters['order'],
+			$this->parameters['for'],
 		]);
 	}
 
@@ -226,10 +229,7 @@ class SqlBuilder
 		$query = "{$querySelect} FROM {$this->delimitedTable}{$queryJoins}{$queryCondition}{$queryEnd}";
 
 		$this->driver->applyLimit($query, $this->limit, $this->offset);
-
-		if ($this->lock !== '') {
-			$query .= " {$this->lock}";
-		}
+		$this->driver->applyFor($query, $this->for);
 
 		return $this->tryDelimite($query);
 	}
@@ -246,7 +246,8 @@ class SqlBuilder
 			$this->parameters['where'],
 			$this->parameters['group'],
 			$this->parameters['having'],
-			$this->parameters['order']
+			$this->parameters['order'],
+			$this->parameters['for']
 		);
 	}
 
@@ -524,15 +525,16 @@ class SqlBuilder
 	}
 
 
-	public function setLock($lock): void
+	public function setFor($for, ...$params): void
 	{
-		$this->lock = $lock;
+		$this->for = $for;
+		$this->parameters['for'] = $params;
 	}
 
 
-	public function getLock(): string
+	public function getFor(): string
 	{
-		return $this->lock;
+		return $this->for;
 	}
 
 

@@ -59,6 +59,12 @@ interface ISupplementalDriver
 	 */
 	function applyLimit(string &$sql, ?int $limit, ?int $offset): void;
 
+	/**
+	 * Injects FOR clause to SQL query.
+	 * @param  string  $sql query that will be modified.
+	 */
+	function applyFor(string &$sql, string $for): void;
+
 	/********************* reflection ****************d*g**/
 
 	/**

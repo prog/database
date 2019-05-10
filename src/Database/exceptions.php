@@ -48,3 +48,11 @@ class NotNullConstraintViolationException extends ConstraintViolationException
 class UniqueConstraintViolationException extends ConstraintViolationException
 {
 }
+
+
+/**
+ * Exception for lock wait timeout.
+ */
+class LockWaitTimeoutException extends DriverException
+{
+}

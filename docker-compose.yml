@@ -1,0 +1,14 @@
+version: "3"
+
+
+services:
+
+
+  mariadb:
+    image: mariadb:10
+    environment:
+      - "MYSQL_DATABASE=nette_test"
+      - "MYSQL_ROOT_PASSWORD=xxx"
+    ports:
+      - "3306:3306"
+

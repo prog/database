@@ -441,13 +441,13 @@ class Selection implements \Iterator, IRowContainer, \ArrayAccess, \Countable
 
 
 	/**
-	 * Set lock clause, more calls rewrite old value.
+	 * Set 'for' clause, more calls rewrite old value.
 	 * @return static
 	 */
-	public function lock(string $lock)
+	public function for(string $for, ...$params)
 	{
 		$this->emptyResultSet();
-		$this->sqlBuilder->setLock($lock);
+		$this->sqlBuilder->setFor($for, ...$params);
 		return $this;
 	}
 
